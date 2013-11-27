@@ -11,26 +11,28 @@
 #include <ctype.h>
 #define MAX 255
 
+/*
+    Blah
+*/
 void echo(int sockfd) {
-  char *c;
-  int status;
-  c = (char *) malloc(sizeof(char)*MAX);
-    while (read(sockfd, c, MAX) != -1)
+    char *c;
+    int status;
+    int i;
+    c = (char *) malloc(sizeof(char)*MAX);
+    while (read(sockfd, c, MAX-1) != -1)
     {
         /* Echo the character. */
-            printf("%s\n", c);
-        if (write(sockfd, c, strlen(c)) == 1)
+        if (write(sockfd, c, strlen(c)) == -1)
         {
             perror("can't write to socket");
         }
-        int i = 0;
-        for (i = 0; i < strlen(c); ++i)
-        {
-            c[i] = '\0';
-        }
+        memset(c, 0, MAX);
     }
 }
 
+/*
+    Programa main
+*/
 int main(int argc, char const *argv[]){
 
     int i = 1;

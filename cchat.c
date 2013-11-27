@@ -11,9 +11,10 @@
 #include <ctype.h>
 
 void copy(int sockfd) {
-  char* outbuffer;
-  char* inbuffer;
-  int max = 255;
+    char* outbuffer;
+    char* inbuffer;
+    int max = 255;
+    int i;
 
     while (1) {
         /* Write a character to the socket. */
@@ -25,12 +26,43 @@ void copy(int sockfd) {
             perror("can't write to socket");
         }
         /* Read the response and print it. */
+        memset(inbuffer, 0, max);
         if (read(sockfd, inbuffer, max) == -1)
             perror("can't read from socket");
         printf("%s\n", inbuffer);
     }
 }
 
+/*
+    Metodo que lee el archivo blah
+*/
+char* Leerarchivo(char *nombre){
+    FILE *f;
+    int i;
+    char *line;
+    line = (char *) malloc(sizeof(char)*max);
+
+    //Abre el archivo
+    f = fopen(nombre, 'r');
+    //Extrae cada linea
+    while(fgets(line, max, f) != NULL)
+   {
+        printf("%s\n", line);
+        comando(line);
+        memset(line, 0, max);
+   }
+   fclose(f); 
+}
+
+/*
+    Envia los comandos al servidor
+*/
+int comando(char *cmd){
+
+}
+/*
+    Programa main
+*/
 int main(int argc, char const *argv[]){
 
     int i = 1;
@@ -82,6 +114,11 @@ int main(int argc, char const *argv[]){
             exit(EXIT_FAILURE);
         }
         i = i + 2;
+    }
+    //Abre el archivo y le pasa linea por linea al servidor
+    if(archivo==NULL){
+
+        Leerarchivo(archivo);
     }
 
     // Se verifica que se introdujeron los argumentos necesarios
