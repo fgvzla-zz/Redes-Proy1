@@ -19,13 +19,23 @@ void echo(int sockfd) {
     int status;
     int i;
     c = (char *) malloc(sizeof(char)*MAX);
+    if (c == NULL)
+    {
+        perror("No se pudo reservar memoria\n");
+        exit(EXIT_FAILURE);
+    }
+    token = (char *) malloc(sizeof(char)*MAX);
+    if (token == NULL)
+    {
+        perror("No se pudo reservar memoria\n");
+        exit(EXIT_FAILURE);
+    }
     while (read(sockfd, c, MAX-1) != -1)
     {
         /*Corta el string en 2 partes y retorna la 1ra al token,
 mientras que la segunda se queda en el c*/
-        token = strtok(c, " ");
-        printf("C: %s\n", c);
-        printf("Token: %s\n", token);
+        token = strsep(&c, " ");
+        token = strtok(token, " ");
         
         //Revisa que encontro en la primera frase del comando
         if(strcmp(token,"men")==0){
