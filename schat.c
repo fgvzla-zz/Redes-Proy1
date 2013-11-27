@@ -7,7 +7,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <strings.h>
+#include <string.h>
 #include <ctype.h>
 #define MAX 255
 
@@ -15,25 +15,44 @@
     Blah
 */
 void echo(int sockfd) {
-    char *c;
+    char *c, *token;
     int status;
     int i;
     c = (char *) malloc(sizeof(char)*MAX);
     while (read(sockfd, c, MAX-1) != -1)
     {
-        /* Echo the character. */
-        if (write(sockfd, c, strlen(c)) == -1)
-        {
-            perror("can't write to socket");
+        /*Corta el string en 2 partes y retorna la 1ra al token,
+mientras que la segunda se queda en el c*/
+        token = strtok(c, " ");
+        printf("C: %s\n", c);
+        printf("Token: %s\n", token);
+        
+        //Revisa que encontro en la primera frase del comando
+        if(strcmp(token,"men")==0){
+             if (write(sockfd, c, strlen(c)) == -1){
+                perror("can't write to socket");
+            }
+            memset(c, 0, MAX);
+        }else if(strcmp(token,"sus")==0){
+            /*El usuario se suscribe a la sala*/
+        }else if(strcmp(token,"des")==0){
+            /*El usuario se sale de la sala*/
+        }else if(strcmp(token,"cre")==0){
+            /*El usuario crea la sala en el servidor*/
+        }else if(strcmp(token,"eli")==0){
+            /*El usuario elimina la sala del servidor*/
+        }else if(strcmp(token,"fue")==0){
+            /*Este comando permite terminar la ejecución del programa de introducción de
+comandos y la ejecución del programa cchat*/
         }
-        memset(c, 0, MAX);
+
     }
 }
 
 /*
     Programa main
 */
-int main(int argc, char const *argv[]){
+int main(int argc, char *argv[]){
 
     int i = 1;
     char *port = NULL, *sala = NULL;

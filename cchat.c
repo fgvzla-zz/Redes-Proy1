@@ -126,7 +126,7 @@ void leerComando(void * pEntrada){
 /*
     Programa main
 */
-int main(int argc, char const *argv[]){
+int main(int argc, char *argv[]){
 
     int i = 1;
     char *host = NULL, *port = NULL, *nombre = NULL, *archivo = NULL;
@@ -232,12 +232,12 @@ int main(int argc, char const *argv[]){
 
     // Creación de los hilos, uno para lectura de comandos por consola y archivo
     // y otro para lectura de mensajes del servidor.
-    if (pthread_create(&hiloE, NULL, leerComando, (void *) param) != 0)
+    if (pthread_create(&hiloE, NULL, (void *)leerComando, (void *)param) != 0)
     {
         perror("Error creando hilo");
     }
 
-    if (pthread_create(&hiloR, NULL, recibir, (void *) socketP) != 0)
+    if (pthread_create(&hiloR, NULL, (void *)recibir, (void *) socketP) != 0)
     {
         perror("Error creando hilo");
     }
