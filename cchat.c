@@ -7,58 +7,123 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <strings.h>
+#include <string.h>
 #include <ctype.h>
+#include <pthread.h>
+#define MAX 255
 
-void copy(int sockfd) {
-    char* outbuffer;
-    char* inbuffer;
-    int max = 255;
-    int i;
+typedef struct
+{
+    int *socket;
+    char *archivo;
+} Param;
 
-    while (1) {
-        /* Write a character to the socket. */
-        outbuffer = (char *) malloc(sizeof(char)*max);
-        inbuffer = (char *) malloc(sizeof(char)*max);
-        getline(&outbuffer, &max, stdin);
-        if (write(sockfd, outbuffer, strlen(outbuffer)-1) == -1)
-        {
-            perror("can't write to socket");
-        }
-        /* Read the response and print it. */
-        memset(inbuffer, 0, max);
-        if (read(sockfd, inbuffer, max) == -1)
-            perror("can't read from socket");
+/**
+ * Lee permanentemente el socket esperando cualquier mensaje del servidor.
+ *
+ * @param  socket  Apuntador al socket abierto al servidor
+ */
+void recibir(void *socket) {
+    int *sockfd;
+    char *inbuffer;
+
+    sockfd = (int *) socket;
+    inbuffer = (char *) (sizeof(char)*MAX);
+    if (inbuffer == NULL)
+    {
+        perror("No se pudo reservar memoria\n");
+        exit(EXIT_FAILURE);
+    }
+    do {
+        // Se limpia el string de lectura y se lee el socket.
+        memset(inbuffer, 0, 255);
+        if (read(*sockfd, inbuffer, MAX-1) == -1)
+            perror("No se puede leer del socket");
         printf("%s\n", inbuffer);
+    } while(1);
+    free(inbuffer);
+    pthread_exit(NULL);
+}
+
+/**
+ * Envia por el socket el comando recibido.
+ *
+ * @param  cmd     Comando a envar al servidor.
+ * @param  sockfd  File descriptor del socket abierto al servidor.
+ */
+void enviar(char *cmd, int *sockfd) {
+    if (write(*sockfd, cmd, strlen(cmd)-1) == -1)
+    {
+        perror("No se puede escribir al socket");
     }
 }
 
-/*
-    Metodo que lee el archivo blah
-*/
-char* Leerarchivo(char *nombre){
-    FILE *f;
+
+/**
+ * Lee el archivo que se recibió por argumento y se pasa cada comando a la 
+ * funcion "enviar" para ser enviada al servidor.
+ *
+ * @param  narchivo  Nombre del archivo a abrir.
+ * @param  sockfd    Apuntador al File Descriptor del socket.
+ */
+void leerArchivo(char *narchivo, int *sockfd){
+    FILE *fd;
     int i;
     char *line;
-    line = (char *) malloc(sizeof(char)*max);
+    line = (char *) malloc(sizeof(char)*MAX);
+    if (line == NULL)
+    {
+        perror("No se pudo reservar memoria\n");
+        exit(EXIT_FAILURE);
+    }
 
-    //Abre el archivo
-    f = fopen(nombre, 'r');
-    //Extrae cada linea
-    while(fgets(line, max, f) != NULL)
+    // Abre el archivo.
+    fd = fopen(narchivo, "r");
+    // Extrae cada linea y se llama a la función enviar pasando el comando leido.
+    while(fgets(line, MAX, fd) != NULL)
    {
         printf("%s\n", line);
-        comando(line);
-        memset(line, 0, max);
+        enviar(line, sockfd);
+        memset(line, 0, MAX);
    }
-   fclose(f); 
+   free(line);
+   fclose(fd); 
 }
 
-/*
-    Envia los comandos al servidor
-*/
-int comando(char *cmd){
+/**
+ * Revisa si se recibió un archivo para procesar los comando, y luego lee por
+ * entrada estandar comando para pasarlos al servidor a través de la función
+ * "enviar".
+ *
+ * @param  pEntrada  Tipo de dato que contiene un apuntador al File Descriptor
+ *                   del socket abierto al servidor y el nombre del archivo.
+ */
+void leerComando(void * pEntrada){
+    Param *param;
+    char *cmd;
+    int max = 255;
 
+    param = (Param *) pEntrada;
+    // Si se recibió un archivo, se llama a la función correspondiente.
+/*    if (param->archivo != NULL)
+    {
+        leerArchivo(param->archivo, param->socket);
+    }*/
+
+    cmd = (char *) malloc(sizeof(char)*MAX);
+    printf("%s\n", "ENTROO HILOE");
+/*    if (cmd == NULL)
+    {
+        perror("No se pudo reservar memoria\n");
+        exit(EXIT_FAILURE);
+    }
+*/    do
+    {
+        getline(&cmd, &max, stdin);
+        enviar(cmd, param->socket);
+    } while (1);
+    free(cmd);
+//    pthread_exit(NULL);
 }
 /*
     Programa main
@@ -67,8 +132,10 @@ int main(int argc, char const *argv[]){
 
     int i = 1;
     char *host = NULL, *port = NULL, *nombre = NULL, *archivo = NULL;
-    int sockfd;
+    int sockfd, *socketP;
     struct sockaddr_in serveraddr;
+    pthread_t hiloR, hiloE;
+    Param *param;
   
     // Verifica que hayan los argumentos suficientes y necesarios
     if (argc < 7){
@@ -115,11 +182,6 @@ int main(int argc, char const *argv[]){
         }
         i = i + 2;
     }
-    //Abre el archivo y le pasa linea por linea al servidor
-    if(archivo==NULL){
-
-        Leerarchivo(archivo);
-    }
 
     // Se verifica que se introdujeron los argumentos necesarios
     if (host == NULL)
@@ -159,15 +221,32 @@ int main(int argc, char const *argv[]){
         exit(EXIT_FAILURE);
     }
 
-    /* Copy input to the server. */
-    copy(sockfd);
+    // Se crea tipo de datos a pasar al hilo de lectura de comandos.
+    param = (Param *) malloc(sizeof(Param));
+    if (param == NULL)
+    {
+        perror("No se pudo reservar memoria\n");
+        exit(EXIT_FAILURE);
+    }
+    param->archivo = archivo;
+    param->socket = &sockfd;
+    socketP = &sockfd;
+
+    // Creación de los hilos, uno para lectura de comandos por consola y archivo
+    // y otro para lectura de mensajes del servidor.
+    if (pthread_create(&hiloE, NULL, leerComando, (void *) param) != 0)
+    {
+        perror("Error creando hilo");
+    }
+
+    if (pthread_create(&hiloR, NULL, recibir, (void *) socketP) != 0)
+    {
+        perror("Error creando hilo");
+    }
+
+    pthread_join(hiloR, NULL);
+    pthread_join(hiloE, NULL);
     close(sockfd);
-    printf("%s\n", "No hice una verga");
+    free(param);
     exit(EXIT_SUCCESS);
 }
-//Funcion de conexion al servidor
-int conexion(int puerto, char* host){
-
-}
-
-//Funcion de manejo de comandos
