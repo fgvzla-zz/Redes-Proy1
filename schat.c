@@ -14,7 +14,7 @@
 /*
     Blah
 */
-void echo(int sockfd) {
+void escuchar(int sockfd) {
     char *c, *token;
     int status;
     int i;
@@ -38,24 +38,20 @@ mientras que la segunda se queda en el c*/
         token = strtok(token, " ");
         
         //Revisa que encontro en la primera frase del comando
-        if(strcmp(token,"men")==0){
-             if (write(sockfd, c, strlen(c)) == -1){
-                perror("can't write to socket");
+        if (strcmp(token,"men")==0){
+            if (write(sockfd, c, strlen(c)) == -1){
+                perror("No se puede escribir en socket");
             }
             memset(c, 0, MAX);
-        }else if(strcmp(token,"sus")==0){
+        } else if (strcmp(token,"sus")==0){
             /*El usuario se suscribe a la sala*/
-        }else if(strcmp(token,"des")==0){
+        } else if (strcmp(token,"des")==0){
             /*El usuario se sale de la sala*/
-        }else if(strcmp(token,"cre")==0){
+        } else if (strcmp(token,"cre")==0){
             /*El usuario crea la sala en el servidor*/
-        }else if(strcmp(token,"eli")==0){
+        } else if (strcmp(token,"eli")==0){
             /*El usuario elimina la sala del servidor*/
-        }else if(strcmp(token,"fue")==0){
-            /*Este comando permite terminar la ejecución del programa de introducción de
-comandos y la ejecución del programa cchat*/
         }
-
     }
 }
 
@@ -81,7 +77,8 @@ int main(int argc, char *argv[]){
     }
 
     // Se leen los argumentos
-    while (i < argc){
+    while (i < argc)
+    {
         if (strcmp(argv[i], "-s") == 0){
             if (sala == NULL){
                 sala = argv[i+1];
@@ -142,17 +139,9 @@ int main(int argc, char *argv[]){
             perror("Error al aceptar la conexión");
         }
         close(sockfd);
-        echo(newsockfd);
-        echo(0);
+        escuchar(newsockfd);
         printf("Escribio\n");
         exit(0);
       }
 
 }
-
-// Funcion de conexion al servidor
-int conexion(int puerto, char* host){
-
-}
-
-// Funcion de manejo de comandos
