@@ -28,7 +28,7 @@ void recibir(void *socket) {
     char *inbuffer;
 
     sockfd = (int *) socket;
-    inbuffer = (char *) (sizeof(char)*MAX);
+    inbuffer = (char *) malloc(sizeof(char)*MAX);
     if (inbuffer == NULL)
     {
         perror("No se pudo reservar memoria\n");
@@ -82,7 +82,6 @@ void leerArchivo(char *narchivo, int *sockfd){
     // Extrae cada linea y se llama a la función enviar pasando el comando leido.
     while(fgets(line, MAX, fd) != NULL)
    {
-        printf("%s\n", line);
         enviar(line, sockfd);
         memset(line, 0, MAX);
    }
@@ -105,25 +104,24 @@ void leerComando(void * pEntrada){
 
     param = (Param *) pEntrada;
     // Si se recibió un archivo, se llama a la función correspondiente.
-/*    if (param->archivo != NULL)
+    if (param->archivo != NULL)
     {
         leerArchivo(param->archivo, param->socket);
-    }*/
+    }
 
     cmd = (char *) malloc(sizeof(char)*MAX);
-    printf("%s\n", "ENTROO HILOE");
-/*    if (cmd == NULL)
+    if (cmd == NULL)
     {
         perror("No se pudo reservar memoria\n");
         exit(EXIT_FAILURE);
     }
-*/    do
+    do
     {
         getline(&cmd, &max, stdin);
         enviar(cmd, param->socket);
     } while (1);
     free(cmd);
-//    pthread_exit(NULL);
+    pthread_exit(NULL);
 }
 /*
     Programa main
