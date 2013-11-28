@@ -1,19 +1,12 @@
 // Proyecto 1 - Servidor
 // Francisco Gamundi
 // Franco Nori
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <string.h>
-#include <ctype.h>
-#define MAX 255
+#include "lista.h"
 
 /**
-    Revisa constantemente lo que se esta escribiendo en el socket
-    @param sockfd parametro que recibe lo que se escribio en el socket
+ * Revisa constantemente lo que se esta escribiendo en el socket
+ * 
+ * @param sockfd parametro que recibe lo que se escribio en el socket
 */
 int escuchar(int sockfd) {
     char *c, *token;
@@ -53,9 +46,9 @@ mientras que la segunda se queda en el c*/
         } else if (strcmp(token,"eli")==0){
             /*El usuario elimina la sala del servidor*/
         } else {
-	  perror("Instruccion no válida!");
-	  //return(1);
-	}
+      perror("Instruccion no válida!");
+      //return(1);
+    }
     }
 }
 
@@ -141,12 +134,12 @@ int main(int argc, char *argv[]){
         if (newsockfd < 0)
         {
             perror("Error al aceptar la conexión");
-	    exit(0);
+            exit(0);
         }
         close(sockfd);
         if(escuchar(newsockfd)==1){
-	   printf("La tas cagando!\n");
-	}
-	printf("Escribio\n");
+       printf("La tas cagando!\n");
+    }
+    printf("Escribio\n");
       }
 }

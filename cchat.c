@@ -223,8 +223,8 @@ int main(int argc, char *argv[]){
     param = (Param *) malloc(sizeof(Param));
     if (param == NULL)
     {
-      perror("No se pudo reservar memoria\n");
-      exit(EXIT_FAILURE);
+        perror("No se pudo reservar memoria\n");
+        exit(EXIT_FAILURE);
     }
     param->archivo = archivo;
     param->socket = &sockfd;
