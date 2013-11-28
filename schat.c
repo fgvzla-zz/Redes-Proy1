@@ -11,10 +11,11 @@
 #include <ctype.h>
 #define MAX 255
 
-/*
-    Blah
+/**
+    Revisa constantemente lo que se esta escribiendo en el socket
+    @param sockfd parametro que recibe lo que se escribio en el socket
 */
-void escuchar(int sockfd) {
+int escuchar(int sockfd) {
     char *c, *token;
     int status;
     int i;
@@ -51,11 +52,14 @@ mientras que la segunda se queda en el c*/
             /*El usuario crea la sala en el servidor*/
         } else if (strcmp(token,"eli")==0){
             /*El usuario elimina la sala del servidor*/
-        }
+        } else {
+	  perror("Instruccion no válida!");
+	  //return(1);
+	}
     }
 }
 
-/*
+/**
     Programa main
 */
 int main(int argc, char *argv[]){
@@ -137,11 +141,12 @@ int main(int argc, char *argv[]){
         if (newsockfd < 0)
         {
             perror("Error al aceptar la conexión");
+	    exit(0);
         }
         close(sockfd);
-        escuchar(newsockfd);
-        printf("Escribio\n");
-        exit(0);
+        if(escuchar(newsockfd)==1){
+	   printf("La tas cagando!\n");
+	}
+	printf("Escribio\n");
       }
-
 }

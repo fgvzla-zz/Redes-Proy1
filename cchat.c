@@ -223,8 +223,8 @@ int main(int argc, char *argv[]){
     param = (Param *) malloc(sizeof(Param));
     if (param == NULL)
     {
-        perror("No se pudo reservar memoria\n");
-        exit(EXIT_FAILURE);
+      perror("No se pudo reservar memoria\n");
+      exit(EXIT_FAILURE);
     }
     param->archivo = archivo;
     param->socket = &sockfd;
@@ -241,7 +241,6 @@ int main(int argc, char *argv[]){
     {
         perror("Error creando hilo");
     }
-
     pthread_join(hiloR, NULL);
     pthread_join(hiloE, NULL);
     close(sockfd);
