@@ -13,7 +13,7 @@ int escuchar(int sockfd) {
     int status;
     int i;
     listaSalas salas;
-    salas = (listaSalas) malloc(sizeof(listaSalas));
+    salas = (listaSalas)malloc(sizeof(listaSalas));
     c = (char *) malloc(sizeof(char)*MAX);
     salas = NULL;
 
@@ -43,6 +43,11 @@ mientras que la segunda se queda en el c*/
             memset(c, 0, MAX);
         } else if (strcmp(token,"sus")==0){
             /*El usuario se suscribe a la sala*/
+            if(buscarSala(salas, c)==1){
+                /*Codigo que hara cuando encuentre la
+                para agregar al cliente a esa sala*/
+                salas->clientes = agregarCliente(salas->clientes, sockfd, c);
+            }
         } else if (strcmp(token,"des")==0){
             /*El usuario se sale de la sala*/
         } else if (strcmp(token,"cre")==0){
@@ -51,6 +56,8 @@ mientras que la segunda se queda en el c*/
         } else if (strcmp(token,"eli")==0){
             /*El usuario elimina la sala del servidor*/
             salas = eliminarSala(salas, c);
+        } else if (strcmp(token,"fue")==0){
+            /*El usuario cierra el programa*/
         } else {
       perror("Instruccion no válida!");
       //return(1);
@@ -144,8 +151,8 @@ int main(int argc, char *argv[]){
         }
         close(sockfd);
         if(escuchar(newsockfd)==1){
-       printf("La tas cagando!\n");
+            printf("Algo\n");
+        }
+        printf("Escribio\n");
     }
-    printf("Escribio\n");
-      }
 }

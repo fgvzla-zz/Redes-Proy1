@@ -34,5 +34,6 @@ extern void limpiarClientes(listaClientes);
 
 extern listaSalas agregarSala(listaSalas, char *);
 extern listaSalas eliminarSala(listaSalas, char *);
+extern int buscarSala(listaSalas, char *);
 extern void iteraSalas(listaSalas);
 extern void limpiarSalas(listaSalas);

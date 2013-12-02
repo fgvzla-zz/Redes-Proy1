@@ -8,23 +8,36 @@ listaClientes agregarCliente(listaClientes l, int sockfd, char *nombre){
     listaClientes nueva_lista, itera;
     itera = l;
     nueva_lista = (listaClientes) malloc(sizeof(listaClientes));
+    //No crea la lista
     if (nueva_lista == NULL) {
         printf("\nActualmente no hay suficiente memoria para esta operacion\n ");
     } else {
         nueva_lista->nombre = (char *) malloc(sizeof(char)*25);
-        if (nueva_lista->nombre == NULL) {
+        //No crea el nombre de la sala en la lista
+        if (nueva_lista->nombre == NULL){
             printf("\nActualmente no hay suficiente memoria para esta operacion\n ");
         }
         strcpy(nueva_lista->nombre, nombre);
         nueva_lista->sockfd = sockfd;
         nueva_lista->prox = NULL;
+        //Caso lista vacia inicialmente
         if (l == NULL)
         {
             return nueva_lista;
+        //Caso lista de salas no vacia
         } else {
             while (itera->prox != NULL)
             {
-                itera = itera->prox;
+                if(strcmp(itera->nombre, nombre)==0){
+                    perror("ERROR; Ya existe un usuario con este nombre!\n");
+                    return l;
+                }else{
+                    itera = itera->prox;
+                }
+            }
+            if(strcmp(itera->nombre, nombre)==0){
+                perror("ERROR; Ya existe un usuario con este nombre!\n");
+                return l;
             }
             itera->prox = nueva_lista;
         }
@@ -36,33 +49,44 @@ listaClientes eliminarCliente(listaClientes l, int sockfd){
     listaClientes itera, anterior;
     anterior = l;
     itera = l;
-    // Caso que recibe lista vacia y caso de que el que hay eliminar es el 
-    // primero.
-    if (anterior == NULL)
+    /* Caso que recibe lista vacia y caso de que el que hay eliminar es el 
+    primero.*/
+    if (itera == NULL)
     {
         return(NULL);
     } else {
-        if (anterior->sockfd == sockfd)
+        /*Caso en que el cliente eliminar esta de primero en la lista*/
+        if(itera->sockfd == sockfd)
         {
-            itera = anterior -> prox;
+            itera = anterior->prox;
             free(anterior->nombre);
             free(anterior);
             return(itera);
-        }
-    }
-
-    // Se busca cada cliente en la lista hasta encontrar la correcta y se procede
-    // a eliminarla.
-    while(itera->prox != NULL)
-    {
-        anterior = itera;
-        itera = itera -> prox;
-        if (itera->sockfd == sockfd)
-        {
-            anterior->prox = itera->prox;
-            free(itera->nombre);
-            free(itera);
-            return(l);
+        }else{
+            /* Se busca cada cliente en la lista hasta encontrar el correcto y se procede
+            a eliminarlo. Cuando llega al ultimo elemento de la lista, se sale.*/
+            while(itera->prox != NULL)
+            {
+                if (itera->sockfd == sockfd)
+                {
+                    anterior->prox = itera->prox;
+                    free(itera->nombre);
+                    free(itera);
+                    return(l);
+                }
+                anterior = itera;
+                itera = itera->prox;
+            }
+            /*Caso en que el cliente esta de ultimo*/
+            if (itera->sockfd == sockfd)
+                {
+                    anterior->prox = itera->prox;
+                    free(itera->nombre);
+                    free(itera);
+                    return(l);
+            }else{
+                perror("ERROR; Dicho usuario no existe. No se pudo eliminar\n");
+            }
         }
     }
     return l;
@@ -154,4 +178,17 @@ listaSalas eliminarSala(listaSalas l, char* nombreSala){
         }
     }
     return l;
+}
+/**Encuentra la sala
+*/
+int buscarSala(listaSalas l, char *nombreSala){
+    listaSalas itera;
+    itera = l;
+    while(itera != NULL){
+        if (strcmp(itera->nombreSala, nombreSala)==0){
+            return 1;
+        }
+        itera = itera->prox;
+    }
+    return 0;
 }
