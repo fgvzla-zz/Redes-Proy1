@@ -34,7 +34,7 @@ struct Para
     char *nombre;
     pthread_t tId;
     listaSalas lSalas;
-    listaClientes lClientes;
+    listaSalas salaActual;
 };
 
 typedef struct Para Param;
@@ -46,6 +46,6 @@ extern void limpiarClientes(listaClientes);
 
 extern listaSalas agregarSala(listaSalas, char *);
 extern listaSalas eliminarSala(listaSalas, char *);
-extern int buscarSala(listaSalas, char *);
+extern listaSalas buscarSala(listaSalas, char *);
 extern void iteraSalas(listaSalas);
 extern void limpiarSalas(listaSalas);

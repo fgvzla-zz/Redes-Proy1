@@ -179,16 +179,27 @@ listaSalas eliminarSala(listaSalas l, char* nombreSala){
     }
     return l;
 }
-/**Encuentra la sala
-*/
-int buscarSala(listaSalas l, char *nombreSala){
+
+void iteraSala(listaSalas salas){
+    listaSalas itera;
+    do
+    {
+        printf("%s\n", itera->nombreSala);
+        itera = itera->prox;
+    } while (itera != NULL);
+}
+
+/*
+ * Encuentra la sala
+ */
+listaSalas buscarSala(listaSalas l, char *nombreSala){
     listaSalas itera;
     itera = l;
     while(itera != NULL){
         if (strcmp(itera->nombreSala, nombreSala)==0){
-            return 1;
+            return itera;
         }
         itera = itera->prox;
     }
-    return 0;
+    return NULL;
 }

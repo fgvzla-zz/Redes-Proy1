@@ -220,7 +220,7 @@ int main(int argc, char *argv[]){
     }
 
     // Se envía el nombre del cliente
-    if (write(sockfd, nombre, strlen(nombre)-1) == -1)
+    if (write(sockfd, nombre, strlen(nombre)) == -1)
     {
         perror("No se puede escribir al socket");
     }
