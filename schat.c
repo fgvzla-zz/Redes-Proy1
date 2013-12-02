@@ -8,11 +8,13 @@
  * 
  * @param sockfd parametro que recibe lo que se escribio en el socket
 */
-int escuchar(int sockfd) {
+int escuchar(void *pEntrada) {
+    Param *param;
     char *c, *token;
     int status;
     int i;
     listaSalas salas;
+    param = (Param *) pEntrada;    
     salas = (listaSalas)malloc(sizeof(listaSalas));
     c = (char *) malloc(sizeof(char)*MAX);
     salas = NULL;
@@ -28,25 +30,25 @@ int escuchar(int sockfd) {
         perror("No se pudo reservar memoria\n");
         exit(EXIT_FAILURE);
     }
-    while (read(sockfd, c, MAX-1) != -1)
+    while (read(param->sockfd, c, MAX-1) != -1)
     {
-        /*Corta el string en 2 partes y retorna la 1ra al token,
-mientras que la segunda se queda en el c*/
+        /* Corta el string en 2 partes y retorna la 1ra al token,
+           mientras que la segunda se queda en el c */
         token = strsep(&c, " ");
         token = strtok(token, " ");
         
-        //Revisa que encontro en la primera frase del comando
+        // Revisa que encontro en la primera frase del comando
         if (strcmp(token,"men")==0){
-            if (write(sockfd, c, strlen(c)) == -1){
+            if (write(param->sockfd, c, strlen(c)) == -1){
                 perror("No se puede escribir en socket");
             }
             memset(c, 0, MAX);
         } else if (strcmp(token,"sus")==0){
-            /*El usuario se suscribe a la sala*/
+            /* El usuario se suscribe a la sala*/
             if(buscarSala(salas, c)==1){
-                /*Codigo que hara cuando encuentre la
-                para agregar al cliente a esa sala*/
-                salas->clientes = agregarCliente(salas->clientes, sockfd, c);
+                /* Codigo que hara cuando encuentre la
+                   para agregar al cliente a esa sala */
+                salas->clientes = agregarCliente(salas->clientes, param->sockfd, c);
             }
         } else if (strcmp(token,"des")==0){
             /*El usuario se sale de la sala*/
@@ -72,13 +74,14 @@ int main(int argc, char *argv[]){
 
     int i = 1;
     char *port = NULL, *sala = NULL;
-
-    int sockfd, newsockfd;
+    Param *param;
+    int sockfd;
     struct sockaddr_in clientaddr, serveraddr;
     int clientaddrlength;
+    listaSalas salas;
   
     // Verifica que hayan los argumentos suficientes y necesarios
-    if (argc < 5){
+    if (argc < 3){
         printf("ERROR; No hay argumentos suficientes!\n");
         return(-1);
     } else if (argc > 5){
@@ -111,16 +114,19 @@ int main(int argc, char *argv[]){
     }
 
     // Se verifica que se introdujeron los argumentos necesarios
-    if (sala == NULL)
-    {
-        printf("ERROR; No se especificó SALA (-s).\n");
-        return(-1);
-    }
     if (port == NULL)
     {
         printf("ERROR; No se especificó PUERTO (-p).\n");
         return(-1);
     }
+
+    // Se crea la lista de salas y se agrega la primera
+    salas = NULL;
+    if (sala == NULL)
+    {
+        sala = "actual";  
+    }
+    salas = agregarSala(salas, sala);
 
     // Se abre el socket
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -141,18 +147,28 @@ int main(int argc, char *argv[]){
     }
 
     while (1) {
+        param = (Param *) malloc(sizeof(Param));
+        param->nombre = (char *) malloc(sizeof(char)*25);
+
         // Se espera por una conexión
         clientaddrlength = sizeof(clientaddr);
-        newsockfd = accept(sockfd, (struct sockaddr *) &clientaddr, &clientaddrlength);
-        if (newsockfd < 0)
+        param->sockfd = accept(sockfd, (struct sockaddr *) &clientaddr, &clientaddrlength);
+        if (param->sockfd < 0)
         {
             perror("Error al aceptar la conexión");
             exit(0);
         }
-        close(sockfd);
-        if(escuchar(newsockfd)==1){
-            printf("Algo\n");
+
+        // Se lee el nombre del cliente y se agrega a la lista de clientes de la
+        // sala por defecto
+        read(param->sockfd, param->nombre, 25);
+        salas->clientes = agregarCliente(salas->clientes, param->sockfd, param->nombre);
+        param->lSalas = salas;
+        param->lClientes = salas->clientes;
+
+        if (pthread_create(&(param->tId), NULL, (void *)escuchar, (void *)param) != 0)
+        {
+            perror("Error creando hilo");
         }
-        printf("Escribio\n");
     }
 }

@@ -219,6 +219,12 @@ int main(int argc, char *argv[]){
         exit(EXIT_FAILURE);
     }
 
+    // Se envía el nombre del cliente
+    if (write(sockfd, nombre, strlen(nombre)-1) == -1)
+    {
+        perror("No se puede escribir al socket");
+    }
+
     // Se crea tipo de datos a pasar al hilo de lectura de comandos.
     param = (Param *) malloc(sizeof(Param));
     if (param == NULL)
