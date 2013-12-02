@@ -117,7 +117,7 @@ void leerComando(void * pEntrada){
     }
     do
     {
-        getline(&cmd, &max, stdin);
+        getline(&cmd, (size_t *)&max, stdin);
         enviar(cmd, param->socket);
     } while (1);
     free(cmd);

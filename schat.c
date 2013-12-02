@@ -12,7 +12,11 @@ int escuchar(int sockfd) {
     char *c, *token;
     int status;
     int i;
+    listaSalas salas;
+    salas = (listaSalas) malloc(sizeof(listaSalas));
     c = (char *) malloc(sizeof(char)*MAX);
+    salas = NULL;
+
     if (c == NULL)
     {
         perror("No se pudo reservar memoria\n");
@@ -43,8 +47,10 @@ mientras que la segunda se queda en el c*/
             /*El usuario se sale de la sala*/
         } else if (strcmp(token,"cre")==0){
             /*El usuario crea la sala en el servidor*/
+            salas = agregarSala(salas, c);
         } else if (strcmp(token,"eli")==0){
             /*El usuario elimina la sala del servidor*/
+            salas = eliminarSala(salas, c);
         } else {
       perror("Instruccion no válida!");
       //return(1);
