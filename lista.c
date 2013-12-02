@@ -92,6 +92,21 @@ listaClientes eliminarCliente(listaClientes l, int sockfd){
     return l;
 }
 
+/*
+ * Encuentra la sala
+ */
+int buscarCliente(listaClientes l, int sockfd){
+    listaClientes itera;
+    itera = l;
+    while(itera != NULL){
+        if (itera->sockfd, sockfd){
+            return 1;
+        }
+        itera = itera->prox;
+    }
+    return 0;
+}
+
 listaSalas agregarSala(listaSalas l, char *nombre){
     listaSalas nueva_lista, itera;
     itera = l;

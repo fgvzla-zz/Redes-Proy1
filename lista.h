@@ -43,6 +43,7 @@ extern listaClientes agregarCliente(listaClientes, int, char *);
 extern listaClientes eliminarCliente(listaClientes, int);
 extern void iteraClientes(listaClientes);
 extern void limpiarClientes(listaClientes);
+extern int buscarCliente(listaClientes, int);
 
 extern listaSalas agregarSala(listaSalas, char *);
 extern listaSalas eliminarSala(listaSalas, char *);

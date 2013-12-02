@@ -86,17 +86,25 @@ int escuchar(void *pEntrada) {
             strcpy(mensaje, param->nombre);
             strcat(mensaje, ": ");
             strcat(mensaje, c);
-            distMensaje(mensaje, lClientes);
+            // Recorremos sala por sala y si el cliente está en esa sala, se
+            // distribuye el mensaje y se sigue buscando.
+            sala = lSalas;
+            do
+            {
+                if (buscarCliente(sala->clientes, param->sockfd))
+                {
+                    distMensaje(mensaje, sala->clientes);
+                }
+                sala = sala->prox;
+            } while (sala != NULL);
+
             memset(mensaje, 0, MAX);
             memset(c, 0, MAX);
         } else if (strcmp(token,"sus")==0){
-            // Se elimina el cliente de la sala actual y se agrega a la lista
-            // de clientes de la nueva sala
-            sala->clientes = eliminarCliente(sala->clientes, param->sockfd);
-            param->salaActual = buscarSala(param->lSalas, c);
-            sala = param->salaActual;
+            // Se busca la sala y se subscribe el cliente.
+            sala = buscarSala(param->lSalas, c);
             sala->clientes = agregarCliente(sala->clientes, param->sockfd, param->nombre);
-            mensaje = strcat(mensaje, "\nAhora está en la sala ");
+            mensaje = strcat(mensaje, "\nAhora está subscrito en la sala ");
             mensaje = strcat(mensaje, c);
             mensaje = strcat(mensaje, "\n");
             if (write(param->sockfd, mensaje, strlen(mensaje)) == -1){
