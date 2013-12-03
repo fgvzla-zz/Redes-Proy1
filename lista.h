@@ -34,7 +34,7 @@ struct Para
     char *nombre;
     pthread_t tId;
     listaSalas lSalas;
-    listaSalas salaActual;
+    listaClientes *lClientes;
 };
 
 typedef struct Para Param;

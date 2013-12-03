@@ -107,16 +107,30 @@ int buscarCliente(listaClientes l, int sockfd){
     return 0;
 }
 
+/*
+ * Encuentra la sala
+ */
+void limpiarClientes(listaClientes l){
+    listaClientes itera, anterior;
+    itera = l;
+    while(itera != NULL){
+        anterior = itera;
+        free(anterior->nombre);
+        free(anterior);
+        itera = itera->prox;
+    }
+}
+
+
+
 listaSalas agregarSala(listaSalas l, char *nombre){
     listaSalas nueva_lista, itera;
     itera = l;
     nueva_lista = (listaSalas) malloc(sizeof(listaSalas));
-    //No crea la lista
     if (nueva_lista == NULL) {
         printf("\nActualmente no hay suficiente memoria para esta operacion\n ");
     } else {
         nueva_lista->nombreSala = (char *) malloc(sizeof(char)*25);
-        //No crea el nombre de la sala en la lista
         if (nueva_lista->nombreSala == NULL){
             printf("\nActualmente no hay suficiente memoria para esta operacion\n ");
         }
@@ -132,8 +146,7 @@ listaSalas agregarSala(listaSalas l, char *nombre){
             while (itera->prox != NULL)
             {
                 if(strcmp(itera->nombreSala, nombre)==0){
-                    perror("ERROR; La sala ya existe con este nombre!\n");
-                    return l;
+                    return NULL;
                 }else{
                     itera = itera->prox;
                 }
@@ -194,6 +207,7 @@ listaSalas eliminarSala(listaSalas l, char* nombreSala){
     }
     return l;
 }
+
 
 void iteraSala(listaSalas salas){
     listaSalas itera;
