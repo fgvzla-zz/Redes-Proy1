@@ -55,14 +55,14 @@ void migrarClientes(listaSalas sala, listaSalas salaInicio){
  */
 int escuchar(void *pEntrada) {
     Param *param;
-    char *c, *token, *mensaje;
+    char *c, *token, *mensaje, *c2;
     int status;
     int i;
     param = (Param *) pEntrada;
     listaClientes lClientes;
-    listaSalas sala;    
-    c = (char *) malloc(sizeof(char)*MAX);
+    listaSalas sala;
 
+    c = (char *) malloc(sizeof(char)*MAX);
     if (c == NULL)
     {
         perror("No se pudo reservar memoria\n");
@@ -80,6 +80,7 @@ int escuchar(void *pEntrada) {
         perror("No se pudo reservar memoria\n");
         exit(EXIT_FAILURE);
     }
+    c2 = c;
     while (read(param->sockfd, c, MAX-1) != -1)
     {
         /* Corta el string en 2 partes y retorna la 1ra al token,
@@ -185,10 +186,15 @@ int escuchar(void *pEntrada) {
                 }
                 sala = sala->prox;
             } while (sala != NULL);
+            mensaje = strcat(mensaje, "fue");
+            envMensaje(mensaje, param->sockfd);
             lClientes = *(param->lClientes);
             lClientes = eliminarCliente(lClientes, param->sockfd);
             close(param->sockfd);
-            pthread_exit(0);
+            free(mensaje);
+            free(token);
+            free(c);
+            pthread_exit(NULL);
         } else if (strcmp(token,"sal") == 0){
             // Se itera por la lista de salas y se van escribiendo en el socket
             // los nombres.
@@ -226,6 +232,7 @@ int escuchar(void *pEntrada) {
             }
             memset(mensaje, 0, MAX);
         }
+        c = c2;
     }
     sala = param->lSalas;
     do
@@ -237,7 +244,10 @@ int escuchar(void *pEntrada) {
         sala = sala->prox;
     } while (sala != NULL);
     close(param->sockfd);
-    pthread_exit(0);
+    free(mensaje);
+    free(token);
+    free(c);
+    pthread_exit(NULL);
 }
 
 /**

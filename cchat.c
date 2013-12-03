@@ -24,7 +24,7 @@ typedef struct
  * @param  socket  Apuntador al socket abierto al servidor
  */
 void recibir(void *socket) {
-    int *sockfd;
+    int *sockfd, size;
     char *inbuffer;
 
     sockfd = (int *) socket;
@@ -37,10 +37,18 @@ void recibir(void *socket) {
     do {
         // Se limpia el string de lectura y se lee el socket.
         memset(inbuffer, 0, 255);
-        if (read(*sockfd, inbuffer, MAX-1) == -1)
+        size = read(*sockfd, inbuffer, MAX-1);
+        if (size == -1)
             perror("No se puede leer del socket");
-        printf("%s\n", inbuffer);
-    } while(1);
+        if (size > 1)
+            if (!strcmp(inbuffer, "fue"))
+            {
+                close(*sockfd);
+                size = -1;
+            } else {
+                printf("%s\n", inbuffer);
+            }
+    } while(size >= 0);
     free(inbuffer);
     pthread_exit(NULL);
 }
@@ -52,9 +60,50 @@ void recibir(void *socket) {
  * @param  sockfd  File descriptor del socket abierto al servidor.
  */
 void enviar(char *cmd, int *sockfd) {
-    if (write(*sockfd, cmd, strlen(cmd)-1) == -1)
+    int size;
+    char *token;
+    token = (char *) malloc(sizeof(char)*MAX);
+    if (token == NULL)
     {
-        perror("No se puede escribir al socket");
+        perror("No se pudo reservar memoria\n");
+        exit(EXIT_FAILURE);
+    }
+
+    size = strlen(cmd);
+    if (size < 4)
+    {
+        printf("%s\n", "Comando no válido");
+    } else {
+        token = strncpy(token, cmd, 3);
+        token[3] = '\0';
+        if (size == 4)
+        {
+            if (!strcmp(token, "sal") || !strcmp(token, "des") || !strcmp(token, "usu") || !strcmp(token, "fue"))
+            {
+                if (write(*sockfd, cmd, strlen(cmd)-1) == -1) {
+                    perror("No se puede escribir al socket");
+                }
+                if (!strcmp(token, "fue"))
+                {
+                    printf("Terminó la ejecucíón del programa\n");
+                    pthread_exit(NULL);
+                }
+            } else {
+                printf("%s\n", "Comando no válido");
+            }
+        } else if (size > 5) {
+            if (!strcmp(token, "men") || !strcmp(token, "sus") || !strcmp(token, "cre") || !strcmp(token, "eli"))
+            {
+                if (write(*sockfd, cmd, strlen(cmd)-1) == -1)
+                {
+                    perror("No se puede escribir al socket");
+                }
+            } else {
+                printf("%s\n", "Comando no válido");
+            }
+        } else {
+            printf("%s\n", "Comando no válido");
+        }
     }
 }
 
@@ -82,6 +131,7 @@ void leerArchivo(char *narchivo, int *sockfd){
     // Extrae cada linea y se llama a la función enviar pasando el comando leido.
     while(fgets(line, MAX, fd) != NULL)
    {
+        usleep(100000);
         enviar(line, sockfd);
         memset(line, 0, MAX);
    }
@@ -100,8 +150,9 @@ void leerArchivo(char *narchivo, int *sockfd){
 void leerComando(void * pEntrada){
     Param *param;
     char *cmd;
-    int max = 255;
+    int max, size;
 
+    max = 255;
     param = (Param *) pEntrada;
     // Si se recibió un archivo, se llama a la función correspondiente.
     if (param->archivo != NULL)
@@ -115,6 +166,9 @@ void leerComando(void * pEntrada){
         perror("No se pudo reservar memoria\n");
         exit(EXIT_FAILURE);
     }
+
+    // See lee la entrada estandar y se envía cada linea leida a la función
+    // enviar.
     do
     {
         getline(&cmd, (size_t *)&max, stdin);
@@ -249,7 +303,6 @@ int main(int argc, char *argv[]){
     }
     pthread_join(hiloR, NULL);
     pthread_join(hiloE, NULL);
-    close(sockfd);
     free(param);
     exit(EXIT_SUCCESS);
 }
