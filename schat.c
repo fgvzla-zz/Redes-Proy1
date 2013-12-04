@@ -88,7 +88,8 @@ int escuchar(void *pEntrada) {
         token = strtok(token, " ");
         
         // Revisa que encontro en la primera frase del comando
-        if (strcmp(token,"men")==0){
+        if (strcmp(token,"men") == 0)
+        {
             /* Si se recibió un mensaje, se guarda en un string junto con el
              * nombre de la persona que lo envio y se distribuye con la funcion
              * dist Mensaje.
@@ -127,7 +128,7 @@ int escuchar(void *pEntrada) {
             envMensaje(mensaje, param->sockfd);
             memset(mensaje, 0, MAX);
             memset(c, 0, MAX);
-        } else if (strcmp(token,"des")==0){
+        } else if (strcmp(token,"des") == 0) {
             // Se elimina el cliente de la sala actual y se agrega a la lista
             // de clientes de la sala
             sala = param->lSalas;
@@ -143,7 +144,7 @@ int escuchar(void *pEntrada) {
             envMensaje(mensaje, param->sockfd);
             memset(mensaje, 0, MAX);
             memset(c, 0, MAX);
-        } else if (strcmp(token,"cre")==0){
+        } else if (strcmp(token,"cre") == 0){
             /*El usuario crea la sala en el servidor*/
             sala = param->lSalas;
             sala = agregarSala(sala, c);
@@ -160,7 +161,7 @@ int escuchar(void *pEntrada) {
             envMensaje(mensaje, param->sockfd);
             memset(mensaje, 0, MAX);
             memset(c, 0, MAX);
-        } else if (strcmp(token,"eli")==0){
+        } else if (strcmp(token,"eli") == 0){
             // Se migran los clientes de la sala a eliminar a la sala defecto y
             // se elimina la sala.
             sala = buscarSala(param->lSalas, c);
@@ -204,7 +205,7 @@ int escuchar(void *pEntrada) {
             } while (sala != NULL);
             memset(mensaje, 0, MAX);
         } else if (strcmp(token,"usu") == 0){
-            // Se itera por la lista de salas y se van escribiendo en el socket
+            // Se itera por la lista de usuarios y se van escribiendo en el socket
             // los nombres.
             lClientes = *(param->lClientes);
             mensaje = strcat(mensaje, "\nLos usuarios conectados actualmente son:\n");

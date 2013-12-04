@@ -48,5 +48,4 @@ extern int buscarCliente(listaClientes, int);
 extern listaSalas agregarSala(listaSalas, char *);
 extern listaSalas eliminarSala(listaSalas, char *);
 extern listaSalas buscarSala(listaSalas, char *);
-extern void iteraSalas(listaSalas);
 extern void limpiarSalas(listaSalas);

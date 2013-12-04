@@ -3,7 +3,15 @@
 // Franco Nori
 
 #include "lista.h"
- 
+
+/**
+ * Agrega un cliente a la lista de clientes recibida como parámetro
+ * 
+ * @param  l         Lista de clientes a agregar el nuevo cliente.
+ * @param  sockfd    File descriptor del socket del cliente.
+ * @param  nombre    String con el nombre del cliente.
+ * @return           Lista de clientes con el nuevo cliente agregado.
+ */
 listaClientes agregarCliente(listaClientes l, int sockfd, char *nombre){
     listaClientes nueva_lista, itera;
     itera = l;
@@ -44,7 +52,14 @@ listaClientes agregarCliente(listaClientes l, int sockfd, char *nombre){
     }
     return l;
 }
- 
+
+/**
+ * Elimina un cliente de la lista de clientes recibida como parámetro
+ * 
+ * @param  l         Lista de clientes a eliminar el cliente.
+ * @param  sockfd    File descriptor del socket del cliente a eliminar.
+ * @return           Lista de clientes sin el cliente eliminado.
+ */
 listaClientes eliminarCliente(listaClientes l, int sockfd){
     listaClientes itera, anterior;
     anterior = l;
@@ -84,7 +99,7 @@ listaClientes eliminarCliente(listaClientes l, int sockfd){
                     free(itera->nombre);
                     free(itera);
                     return(l);
-            }else{
+            } else {
                 perror("ERROR; Dicho usuario no existe. No se pudo eliminar\n");
             }
         }
@@ -92,8 +107,12 @@ listaClientes eliminarCliente(listaClientes l, int sockfd){
     return l;
 }
 
-/*
- * Encuentra la sala
+/**
+ * Busca un cliente en una lista dada.
+ * 
+ * @param  l         Lista de clientes a buscar el cliente.
+ * @param  sockfd    File descriptor del socket del cliente a buscar.
+ * @return           Entero indicando si se encontró o no el cliente.
  */
 int buscarCliente(listaClientes l, int sockfd){
     listaClientes itera;
@@ -107,8 +126,10 @@ int buscarCliente(listaClientes l, int sockfd){
     return 0;
 }
 
-/*
- * Encuentra la sala
+/**
+ * Borra todos los elementos de una lista de clientes.
+ * 
+ * @param  l         Lista de clientes a borrar.
  */
 void limpiarClientes(listaClientes l){
     listaClientes itera, anterior;
@@ -122,7 +143,14 @@ void limpiarClientes(listaClientes l){
 }
 
 
-
+/**
+ * Agrega una sala a la lista de salas recibida como parámetro
+ * 
+ * @param  l         Lista de salas a agregar la nueva sala.
+ * @param  nombre    String con el nombre de la sala a crear.
+ * @return           Lista de clientes con la nueva sala agergada o NULL si ya
+ *                   existe.
+ */
 listaSalas agregarSala(listaSalas l, char *nombre){
     listaSalas nueva_lista, itera;
     itera = l;
@@ -152,8 +180,7 @@ listaSalas agregarSala(listaSalas l, char *nombre){
                 }
             }
             if(strcmp(itera->nombreSala, nombre)==0){
-                perror("ERROR; La sala ya existe con este nombre!\n");
-                return l;
+                return NULL;
             }
             itera->prox = nueva_lista;
         }
