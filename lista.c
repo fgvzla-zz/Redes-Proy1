@@ -187,7 +187,14 @@ listaSalas agregarSala(listaSalas l, char *nombre){
     }
     return l;
 }
- 
+
+/**
+ * Elimina una sala de la lista de salas recibida como parámetro
+ * 
+ * @param  l           Lista de salas a eliminar la sala.
+ * @param  nombreSala  Nombre de la sala a eliminar.
+ * @return             Lista de salas sin la sala eliminada.
+ */
 listaSalas eliminarSala(listaSalas l, char* nombreSala){
     listaSalas itera, anterior;
     anterior = l;
@@ -236,17 +243,12 @@ listaSalas eliminarSala(listaSalas l, char* nombreSala){
 }
 
 
-void iteraSala(listaSalas salas){
-    listaSalas itera;
-    do
-    {
-        printf("%s\n", itera->nombreSala);
-        itera = itera->prox;
-    } while (itera != NULL);
-}
-
-/*
- * Encuentra la sala
+/**
+ * Busca una sala de la lista de salas recibida como parámetro
+ * 
+ * @param  l           Lista de salas a buscar la sala.
+ * @param  nombreSala  Nombre de la sala a buscar.
+ * @return             La sala que se buscaba, o NULL si no existe.
  */
 listaSalas buscarSala(listaSalas l, char *nombreSala){
     listaSalas itera;
